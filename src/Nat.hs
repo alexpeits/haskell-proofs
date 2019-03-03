@@ -5,9 +5,12 @@
 {-# LANGUAGE UndecidableInstances #-}
 module Nat where
 
+import Data.Kind
+import GHC.TypeLits (TypeError, ErrorMessage(..))
+
 data Nat = Z | S Nat
 
-data SNat :: Nat -> * where
+data SNat :: Nat -> Type where
   SZ :: SNat Z
   SS :: SNat n -> SNat (S n)
 
@@ -30,6 +33,14 @@ instance IsNat n => IsNat (S n)      where nat =  SS nat
 spred :: SNat (S n) -> SNat n
 spred (SS n) = n
 
+type family P n where
+  P Z     = Z
+  P (S n) = n
+
+type family NonZero n where
+  NonZero Z     = TypeError (Text "`Z` is not non-zero, m8")
+  NonZero (S n) = True ~ True
+
 --
 -- Addition
 --
@@ -41,6 +52,13 @@ type family a + b where
 n !+ SZ     = n
 n !+ (SS m) = SS (n !+ m)
 
+--
+-- Subtraction
+--
+
+type family a - b where
+  a - Z   = a
+  a - S b = P (a - b)
 
 --
 -- Multiplication
@@ -52,3 +70,29 @@ type family a * b where
 (!*) :: SNat n -> SNat m -> SNat (n * m)
 n !* SZ     = SZ
 n !* (SS m) = (n !* m) !+ n
+
+
+--
+-- Comparison
+--
+
+type family Min n m where
+  Min Z Z = Z
+  Min (S n) Z = Z
+  Min Z (S n) = Z
+  Min (S n) (S m) = S (Min n m)
+
+type family Max n m where
+  Max Z Z = Z
+  Max (S n) Z = S n
+  Max Z (S n) = S n
+  Max (S n) (S m) = S (Max n m)
+
+
+--
+-- Finite set
+--
+
+data Fin :: Nat -> Type where
+  FZ :: Fin (S n)
+  FS :: Fin n -> Fin (S n)

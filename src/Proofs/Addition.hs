@@ -1,7 +1,7 @@
-{-# LANGUAGE DataKinds            #-}
-{-# LANGUAGE GADTs                #-}
-{-# LANGUAGE ScopedTypeVariables  #-}
-{-# LANGUAGE TypeOperators        #-}
+{-# LANGUAGE DataKinds           #-}
+{-# LANGUAGE GADTs               #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators       #-}
 module Proofs.Addition where
 
 import Data.Type.Equality
@@ -63,7 +63,7 @@ plusAssoc' a b (SS c) =
   in proof a b c
 
 -- Plus Commutativity
-plusComm :: SNat a -> SNat b -> (a + b) :~: (b + a)
+plusComm :: SNat a ->  SNat b  -> (a + b) :~: (b + a)
 plusComm SZ     SZ      = Refl
 plusComm a      SZ      = gcastWith (plusIdenL a) Refl
 plusComm SZ     (SS SZ) = Refl
